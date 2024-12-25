@@ -39,7 +39,6 @@ def make_function_async(fun):
     def async_fun(self, *args, **kwargs):
         self._2original_thread_queue.put(_concurrentEvent.START)
         return async_keyword_execution_base._threadPool.submit(fun, self, *args, **kwargs)
-
     return async_fun
 
 class async_keyword_execution_base:
@@ -47,7 +46,7 @@ class async_keyword_execution_base:
 
     def __init__(self):
         self._2original_thread_queue = Queue()
-    
+
     @not_keyword
     def call_function_from_originating_thread(self, fun, *args, **kwargs):
         """
@@ -57,8 +56,7 @@ class async_keyword_execution_base:
             fun(*args, **kwargs)
         else:
             self._2original_thread_queue.put((_concurrentEvent.CALL, fun, None, args, kwargs,))
-    
-    
+
     @not_keyword
     def call_function_from_originating_thread_and_wait_for_result(self, fun, *args, **kwargs):
         """
@@ -70,7 +68,7 @@ class async_keyword_execution_base:
             _q = Queue()
             self._2original_thread_queue.put((_concurrentEvent.CALL, fun, _q,   args, kwargs,))
             return _q.get()
-        
+
     @not_keyword
     def run_keyword_async(self, keyword, *args, **kwargs):
         """
@@ -80,7 +78,26 @@ class async_keyword_execution_base:
             return _run_keyword(*args, **kwargs)
         else:
             self._2original_thread_queue.put((_concurrentEvent.CALL, _run_keyword, None, (keyword, *args,), kwargs,))
-            
+
+    def _work_message(self, _executions):
+        msg = self._2original_thread_queue.get()
+        match msg:
+            case _concurrentEvent.START:
+                _executions += 1
+            case _concurrentEvent.END:
+                _executions -= 1
+            case (_concurrentEvent.EXCEPTION, e):
+                _executions -= 1
+                logger.error(f"Exception in asynchronous execution: {e}")
+            case (_concurrentEvent.CALL, fun, None, args, kwargs):
+                fun(*args, **kwargs)
+            case (_concurrentEvent.CALL, fun, q, args, kwargs):
+                q.put(fun(*args, **kwargs))
+            case _:
+                raise AssertionError(f"Unexpected message from async: ")
+        self._2original_thread_queue.task_done()
+        return _executions
+
     def wait_for_async_execution_completion(self ):
         """
         This function is used to wait for the completion of all asynchronous executions
@@ -90,17 +107,4 @@ class async_keyword_execution_base:
         _executions = 1
         self._2original_thread_queue.task_done()
         while _executions > 0:
-            msg = self._2original_thread_queue.get()
-            match msg:
-                case _concurrentEvent.START:
-                    _executions += 1
-                case _concurrentEvent.END:
-                    _executions -= 1
-                case (_concurrentEvent.EXCEPTION, e):
-                    _executions -= 1
-                    logger.error(f"Exception in asynchronous execution: {e}")
-                case (_concurrentEvent.CALL, fun, None, args, kwargs):
-                    fun(*args, **kwargs)
-                case (_concurrentEvent.CALL, fun, q, args, kwargs):
-                    q.put(fun(*args, **kwargs))
-            self._2original_thread_queue.task_done()
+            _executions = self._work_message(_executions)
