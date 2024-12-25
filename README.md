@@ -7,10 +7,10 @@ This repo serves several tasks.
  - base the workshop at robocon about concurrency
 
 ## Why reinventign the wheel?
-[thread enabled fork](https://github.com/test-fullautomation/robotframework-documentation)
-[robotframework-async-keyword](https://pypi.org/project/robotframework-async-keyword/)
-async functions are supported in regular robotframework since 6.1
-[robotframework-gevent](https://github.com/eldaduzman/robotframework-gevent)
+ - [thread enabled fork](https://github.com/test-fullautomation/robotframework-documentation)
+ - [robotframework-async-keyword](https://pypi.org/project/robotframework-async-keyword/)
+ - async functions are supported in regular robotframework since 6.1
+ - [robotframework-gevent](https://github.com/eldaduzman/robotframework-gevent)
 many more aproaches to run keywords concurrently
 
 ### The process star aproach
