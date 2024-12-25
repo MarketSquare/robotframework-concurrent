@@ -27,8 +27,8 @@ jobs:
 
       - name: Run basic tests
         run: |
-          uvx xonsh tasks/async_start.xsh
           uvx xonsh tasks/process_start.xsh
+          uvx xonsh tasks/async_start.xsh
       - name: Upload Robot Framework log
         if: always()
         uses: actions/upload-artifact@v3
