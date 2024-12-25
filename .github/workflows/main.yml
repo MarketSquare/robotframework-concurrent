@@ -27,8 +27,15 @@ jobs:
 
       - name: Run basic tests
         run: |
-          uvx xonsh tasks/process_start.xsh
-          uvx xonsh tasks/async_start.xsh
+          uv sync --extra test
+          cd atest/async/event
+          uv run robot -L TRACE .
+          cd ../evenOdd
+          uv run robot -L TRACE .
+          cd ../../process_swarm
+          uv run robot -L TRACE swarm.robot
+
+
       - name: Upload Robot Framework log
         if: always()
         uses: actions/upload-artifact@v3
