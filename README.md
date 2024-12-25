@@ -6,6 +6,18 @@ This repo serves several tasks.
  - propose changes to robotframework
  - base the workshop at robocon about concurrency
 
+## Why reinventign the wheel?
+[thread enabled fork](https://github.com/test-fullautomation/robotframework-documentation)
+[robotframework-async-keyword](https://pypi.org/project/robotframework-async-keyword/)
+async functions are supported in regular robotframework since 6.1
+[robotframework-gevent](https://github.com/eldaduzman/robotframework-gevent)
+many more aproaches to run keywords concurrently
+
+### The process star aproach
+This one is especially simpel to implement, safe and I have not seen a proposal in the wild.
+### The async/task aproach
+A technique which allows all robotrfamework features to be used, (only quick ones make sense), from the background threads is a feature not provided by the competing solutions, also the event based organisation apears to be novel.
+
 ## Ideas how to modify robotframework proper for better concurrency support
 
 ### process star
@@ -27,5 +39,7 @@ Add a checker which warns/fails if a function or method is called from a thread 
 | order in log is reliable | yes      |    no |
 
 ## Project todo list
-improve quality controll (add mutation testing)
-get real world usage examples out
+ - improve quality controll (add mutation testing)
+ - get real world usage examples out
+ - add asyncio example
+ - add technique of async/task for function (as oposed to library) keyword libraries.
