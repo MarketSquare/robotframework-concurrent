@@ -2,33 +2,38 @@
 
 ## Purpose of this repo
 This repo serves several tasks.
- - Show the current state of concurrent robotframework executions.
- - propose changes to robotframework
+ - Show the current state of concurrent robot framework executions.
+ - propose changes to robot framework
  - base the workshop at robocon about concurrency
 
-## Why reinventign the wheel?
+## Why reinvent the wheel?
  - [thread enabled fork](https://github.com/test-fullautomation/robotframework-documentation)
  - [robotframework-async-keyword](https://pypi.org/project/robotframework-async-keyword/)
- - async functions are supported in regular robotframework since 6.1
+ - async functions have been supported in regular robot framework since 6.1
  - [robotframework-gevent](https://github.com/eldaduzman/robotframework-gevent)
    
-many more aproaches to run keywords concurrently
+many more approaches to run keywords concurrently. All of those I got across had at least one of these drawbacks.:
 
-### The process star aproach
-This one is especially simpel to implement, safe and I have not seen a proposal in the wild.
-### The async/task aproach
-A technique which allows all robotrfamework features to be used, (only quick ones make sense), from the background threads is a feature not provided by the competing solutions, also the event based organisation apears to be novel.
+ - external dependencies
+ - single technique approach
+ - lack of examples tests and CI
+ - Too high code complexity
 
-## Ideas how to modify robotframework proper for better concurrency support
+### The process star approach
+This one is straightforward to implement and safe and I have not seen a proposal in the wild.
+### The async/task approach
+A technique that allows all robot framework features to be used, (only quick ones make sense), from the background threads is a feature not provided by the competing solutions, also the event-based organization appears to be novel.
+
+## Ideas on how to modify the robot framework properly for better concurrency support
 
 ### process star
 The currently presented solution uses subprocess.Popen, which is ok.
 However _IF_ there would be code added to the startup code of the robotframework, we could use multiprocessing.Process, which on some platforms uses the Fork call which is way more efficient than Popen, and generally the better solution...
 
-An anchor marker could be made available, to allow to be used as a reference point for suites.
+An anchor marker could be made available, to be used as a reference point for suites. This would make it easier to debug why a suite was not found, both in hte context of process star, and in regular usage.
 
 ### threads and async
-Add a checker which warns/fails if a function or method is called from a thread which is not apropriate. This is going to bring runtime costs, and whil not work for functions/methods outside of our controll so it would propably be the most usefull if it is an optionally enabled feature.
+Add a checker that warns/fails if a function or method is called from a thread that is not appropriate. This will bring runtime costs, and will not work for functions/methods outside of our control so it would probably be the most useful if it is an optionally enabled feature.
 
 ## Advantages and disadvantages
 | Tables        | process star           | async/thread  |
