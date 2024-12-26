@@ -21,7 +21,7 @@ many more approaches to run keywords concurrently. All of those I got across had
 
 ### The process star approach
 This one is straightforward to implement and safe and I have not seen a proposal in the wild.
-### The async/task approach
+### The events/task approach
 A technique that allows all robot framework features to be used, (only quick ones make sense), from the background threads is a feature not provided by the competing solutions, also the event-based organization appears to be novel.
 
 ## Ideas on how to modify the robot framework properly for better concurrency support
@@ -32,11 +32,11 @@ However _IF_ there would be code added to the startup code of the robotframework
 
 An anchor marker could be made available, to be used as a reference point for suites. This would make it easier to debug why a suite was not found, both in hte context of process star, and in regular usage.
 
-### threads and async
+### threads and events
 Add a checker that warns/fails if a function or method is called from a thread that is not appropriate. This will bring runtime costs, and will not work for functions/methods outside of our control so it would probably be the most useful if it is an optionally enabled feature.
 
 ## Advantages and disadvantages
-| Tables        | process star           | async/thread  |
+| Tables        | process star           | event/callback/thread  |
 | ------------- |:-------------:| -----:|
 | relation with other concurrancy solutions | everything goes | this solutin uses threads, dont mix with process based parallelism (Fork) |
 | limitations on sharing data      | only pickleable, no references, no file objects      |   no limits |
