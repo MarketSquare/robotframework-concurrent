@@ -75,7 +75,7 @@ class async_keyword_execution_base:
         This function is used to run a keyword from the originating thread.
         """
         if threading.current_thread() == threading.main_thread():
-            return _run_keyword(*args, **kwargs)
+            _run_keyword(keyword, *args, **kwargs)
         else:
             self._2original_thread_queue.put((_concurrentEvent.CALL, _run_keyword, None, (keyword, *args,), kwargs,))
 
