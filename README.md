@@ -28,7 +28,7 @@ A technique that allows all robot framework features to be used, (only quick one
 
 ### process star
 The currently presented solution uses subprocess.Popen, which is ok.
-However _IF_ there would be code added to the startup code of the robotframework, we could use multiprocessing.Process, which on some platforms uses the Fork call which is way more efficient than Popen, and generally the better solution...
+However _IF_ there would be code added to the startup code of the robot framework, we could use multiprocessing.Process, which at least on some platforms uses the Fork call is way more efficient than Popen, and generally the better solution...
 
 An anchor marker could be made available, to be used as a reference point for suites. This would make it easier to debug why a suite was not found, both in hte context of process star, and in regular usage.
 
@@ -36,16 +36,16 @@ An anchor marker could be made available, to be used as a reference point for su
 Add a checker that warns/fails if a function or method is called from a thread that is not appropriate. This will bring runtime costs, and will not work for functions/methods outside of our control so it would probably be the most useful if it is an optionally enabled feature.
 
 ## Advantages and disadvantages
-| Tables        | process star           | event/callback/thread  |
-| ------------- |:-------------:| -----:|
-| relation with other concurrancy solutions | everything goes | this solutin uses threads, dont mix with process based parallelism (Fork) |
-| limitations on sharing data      | only pickleable, no references, no file objects      |   no limits |
-| performance of data exchange | slower, large data needs to be copied      |    faster, references are possible |
-| synchronisation bugs | not possible      |    avoidable, but possible |
-| order in log is reliable | yes      |    no |
+| Tables        | process star           | event/callback/thread  | async functions |
+| ------------- |:-------------:| -----:|-----:|
+| relation with other concurrency solutions | everything goes | this solution uses threads, don't mix with process-based parallelism (Fork) | |
+| limitations on sharing data      | only pickleable, no references, no file objects      |   no limits | |
+| performance of data exchange | slower, large data needs to be copied      |    faster, references are possible ||
+| synchronisation bugs | not possible      |    avoidable, but possible ||
+| order in log is reliable | yes      |    no ||
 
 ## Project todo list
- - improve quality controll (add mutation testing)
- - get real world usage examples out
+ - improve quality control (add mutation testing)
+ - get real-world usage examples out
  - add asyncio example
- - add technique of async/task for function (as oposed to library) keyword libraries.
+ - add the technique of event/task for function (as oposed to library) keyword libraries.
