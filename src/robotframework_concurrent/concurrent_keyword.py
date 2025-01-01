@@ -1,11 +1,13 @@
 import robot.api.logger as logger
 from queue import Queue
+from queue import Empty
 from robot.api.deco import not_keyword
 import threading
 from enum import Enum as Enum
 from concurrent.futures import ThreadPoolExecutor
 import os
 import robot.libraries.BuiltIn as BuiltIn
+
 
 class _concurrentEvent(Enum):
     START = 1
@@ -46,6 +48,7 @@ class async_keyword_execution_base:
 
     def __init__(self):
         self._2original_thread_queue = Queue()
+        self._executions = 0
 
     @not_keyword
     def call_function_from_originating_thread(self, fun, *args, **kwargs):
@@ -79,15 +82,15 @@ class async_keyword_execution_base:
         else:
             self._2original_thread_queue.put((_concurrentEvent.CALL, _run_keyword, None, (keyword, *args,), kwargs,))
 
-    def _work_message(self, _executions):
-        msg = self._2original_thread_queue.get()
+    def _work_message(self, timeout=None):
+        msg = self._2original_thread_queue.get(timeout=timeout)
         match msg:
             case _concurrentEvent.START:
-                _executions += 1
+                self._executions += 1
             case _concurrentEvent.END:
-                _executions -= 1
+                self._executions -= 1
             case (_concurrentEvent.EXCEPTION, e):
-                _executions -= 1
+                self._executions -= 1
                 logger.error(f"Exception in asynchronous execution: {e}")
             case (_concurrentEvent.CALL, fun, None, args, kwargs):
                 fun(*args, **kwargs)
@@ -96,15 +99,18 @@ class async_keyword_execution_base:
             case _:
                 raise AssertionError(f"Unexpected message from async: ")
         self._2original_thread_queue.task_done()
-        return _executions
+    
+    def poll_messages_from_tasks(self):
+        try:
+            while True:
+                self._work_message(timeout=0)
+        except Empty:
+            pass
+
 
     def wait_for_async_execution_completion(self ):
         """
         This function is used to wait for the completion of all asynchronous executions
         """
-        firstMessage = self._2original_thread_queue.get()
-        assert firstMessage == _concurrentEvent.START, "Expected start, received: {firstMessage}"
-        _executions = 1
-        self._2original_thread_queue.task_done()
-        while _executions > 0:
-            _executions = self._work_message(_executions)
+        while self._executions > 0 or not self._2original_thread_queue.empty():
+            self._work_message()
