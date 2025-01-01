@@ -20,9 +20,9 @@ def _run_keyword(keyword, *args, **kwargs):
     return BuiltIn.BuiltIn().run_keyword(keyword, *args)
 
 @not_keyword
-def make_function_async(fun):
+def make_function_concurrent(fun):
     """
-    This decorator is used to make a method asynchronous.
+    This decorator is used to make a method concurrent.
     """
 
     def _wrap(fun):
@@ -38,12 +38,12 @@ def make_function_async(fun):
 
     fun = _wrap(fun)
 
-    def async_fun(self, *args, **kwargs):
+    def concurrent_fun(self, *args, **kwargs):
         self._2original_thread_queue.put(_concurrentEvent.START)
-        return async_keyword_execution_base._threadPool.submit(fun, self, *args, **kwargs)
-    return async_fun
+        return concurrent_keyword_execution_base._threadPool.submit(fun, self, *args, **kwargs)
+    return concurrent_fun
 
-class async_keyword_execution_base:
+class concurrent_keyword_execution_base:
     _threadPool = ThreadPoolExecutor(max_workers=os.cpu_count()*2)
 
     def __init__(self):
@@ -73,7 +73,7 @@ class async_keyword_execution_base:
             return _q.get()
 
     @not_keyword
-    def run_keyword_async(self, keyword, *args, **kwargs):
+    def run_keyword_concurrent(self, keyword, *args, **kwargs):
         """
         This function is used to run a keyword from the originating thread.
         """
@@ -91,13 +91,13 @@ class async_keyword_execution_base:
                 self._executions -= 1
             case (_concurrentEvent.EXCEPTION, e):
                 self._executions -= 1
-                logger.error(f"Exception in asynchronous execution: {e}")
+                logger.error(f"Exception in concurrent execution: {e}")
             case (_concurrentEvent.CALL, fun, None, args, kwargs):
                 fun(*args, **kwargs)
             case (_concurrentEvent.CALL, fun, q, args, kwargs):
                 q.put(fun(*args, **kwargs))
             case _:
-                raise AssertionError(f"Unexpected message from async: ")
+                raise AssertionError(f"Unexpected message from concurrent execution: ")
         self._2original_thread_queue.task_done()
     
     def poll_messages_from_tasks(self):
@@ -108,9 +108,9 @@ class async_keyword_execution_base:
             pass
 
 
-    def wait_for_async_execution_completion(self ):
+    def wait_for_concurrent_execution_completion(self ):
         """
-        This function is used to wait for the completion of all asynchronous executions
+        This function is used to wait for the completion of all concurrent executions
         """
         while self._executions > 0 or not self._2original_thread_queue.empty():
             self._work_message()
