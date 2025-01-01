@@ -9,7 +9,7 @@ class concurrent_keyword_demo(concurrent_keyword.concurrent_keyword_execution_ba
     @concurrent_keyword.make_function_concurrent
     def wait_and_trigger_event(self):
         time.sleep(2)
-        self.run_keyword_async("Log", "Triggering event", "INFO", False, True)
+        self.run_keyword_concurrent("Log", "Triggering event", "INFO", False, True)
         time.sleep(1)
-        self.run_keyword_async("Log", "Triggering event", "INFO", False, True)
+        self.run_keyword_concurrent("Log", "Triggering event", "INFO", False, True)
         

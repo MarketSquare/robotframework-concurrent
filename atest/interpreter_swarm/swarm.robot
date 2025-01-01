@@ -1,10 +1,10 @@
 *** Settings ***
-Library                 robotframework_concurrent.interpreter_star   started.robot       WITH NAME      interpreter1
-Library                 robotframework_concurrent.interpreter_star   started2.robot      WITH NAME      interpreter2
+Library                 robotframework_concurrent.interpreter_star   atest/interpreter_swarm/started.robot       WITH NAME      interpreter1
+Library                 robotframework_concurrent.interpreter_star   atest/interpreter_swarm/started2.robot      WITH NAME      interpreter2
 Test Setup              Test setup keyword
 Test Teardown           Test teardown keyword
 *** Test Cases ***
-basic   
+basic
     interpreter1.Send Message        order order
     interpreter2.Send Message        reorder reorder
     ${GREET}=           interpreter1.Recv Message
@@ -27,4 +27,3 @@ Test setup keyword
 Test teardown keyword
     interpreter1.interpreter_Should_Have_Terminated
     interpreter2.interpreter_Should_Have_Terminated
-    
